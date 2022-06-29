@@ -43,33 +43,14 @@ public class SendEmailRepository {
 	}
 
 	public List<SendEmail> findByKey(String key) {
-		String sql = "SELECT unique_key FROM regist_url WHERE email=:email and register_date +cast('1 days' as interval)>now();";
+		String sql = "SELECT * FROM regist_url WHERE unique_key=:unique_key and register_date +cast('1 days' as interval)>now();";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("unique_key", key);
 		List<SendEmail> accessKey = template.query(sql, param, EMAIL_ROW_MAPPER);
-		if (accessKey.size() == 0) {
-			return null;
-		}
+
 		return accessKey;
 	}
 	
 	
 	
-	// URLの有効期限が24時間のやつのメソッド(没)
 
-//	public String findByKeyAndTime(String key, LocalDateTime before24Hour) {
-//		System.out.println("before24Hour:" + before24Hour);
-//		String sql = "select * from regist_url where unique_key=:unique_key and time_stamp>=:before24Hour";
-//		SqlParameterSource param = new MapSqlParameterSource().addValue("uniqueKey", key).addValue("before24Hour",
-//		before24Hour);
-//		String email = null;
-//		try {
-//			email = template.queryForObject(sql, param, String.class);
-//		} catch (EmptyResultDataAccessException e) {
-//			// TODO: handle exception
-//			e.printStackTrace();
-//			email = null;
-//		}
-//		System.out.println(email);
-//		return email;
-//	}
 }
