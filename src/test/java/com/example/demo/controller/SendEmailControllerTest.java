@@ -24,6 +24,7 @@ import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import com.github.springtestdbunit.annotation.ExpectedDatabase;
+import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
 
 @SpringBootTest
 @DbUnitConfiguration(dataSetLoader = XlsDataSetLoader.class)
@@ -88,7 +89,7 @@ class SendEmailControllerTest {
 	@Test
 	@DisplayName("会員登録していないユーザーに対してメールが送られるか")
 	@DatabaseSetup("classpath:send_email_01.xlsx") // テスト実行前に初期データを投入
-	@ExpectedDatabase("classpath:expected_send_email_01.xlsx")
+	@ExpectedDatabase(value = "classpath:expected_send_email_01.xlsx", assertionMode = DatabaseAssertionMode.NON_STRICT)
 	void testToSendEmail() throws Exception {
 		MvcResult mvcResult = mockMvc.perform(post("/user/create").param("email", "samplenomail@sample.com"))
 				.andExpect(view().name("redirect:/user/index2")).andReturn();
@@ -143,12 +144,13 @@ class SendEmailControllerTest {
 
 	@Test
 	@DisplayName("ユーザー本登録、正常系")
-	@DatabaseSetup("classpath:regist_user_01.xlsx") // テスト実行前に初期データを投入
-	//@ExpectedDatabase("classpath:expected_regist_user_01.xlsx")
+	@DatabaseSetup("classpath:regist_user_00.xlsx") // テスト実行前に初期データを投入
+	@ExpectedDatabase(value = "classpath:expected_regist_user_01.xlsx", assertionMode = DatabaseAssertionMode.NON_STRICT)
 	void testToRegistUser() throws Exception {
 		MvcResult mvcResult = mockMvc
 				.perform(post("/user/confirm").param("name", "菅原光").param("kana", "すがわらひかる")
-						.param("zipCode", "123-4598").param("address", "東京都港区赤坂").param("phone", "000-1234-1234")
+						.param("zipCode", "123-4598").param("address", "東京都港区赤坂")
+						.param("email", "samplenomail@sample.com").param("phone", "000-1234-1234")
 						.param("password", "morimori")
 						.param("confirmPassword", "morimori"))
 				.andExpect(view().name("redirect:/user/index3")).andReturn();
