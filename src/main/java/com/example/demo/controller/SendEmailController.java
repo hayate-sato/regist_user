@@ -68,12 +68,20 @@ public class SendEmailController {
 		String uniqueKey = UUID.randomUUID().toString();
 
 		String email = form.getEmail();
+		
+		List<RegistUser> userList = registUserService.findByEmail(email);
 
 		List<SendEmail> emailList = sendEmailService.findByEmail(email);
 		if (emailList != null) {
 			result.rejectValue("email", null, "24時間以内にURLを発行済みです");
 			return "email_submit";
-		} else {
+		}
+		if(userList!=null) {
+			result.rejectValue("email", null, "このメールアドレスは既に登録済みです。");
+			return "email_submit";
+		}
+		
+		else {
 
 		sendEmail.setEmail(email);
 		sendEmail.setUniqueKey(uniqueKey);
@@ -85,7 +93,7 @@ public class SendEmailController {
 
 		SimpleMailMessage msg = new SimpleMailMessage();
 		try {
-			msg.setFrom("rakuraku.robot.202204@gmail.com");
+			msg.setFrom("send@sample.com");
 			msg.setTo(email);
 			msg.setSubject("ユーザ登録URLの送付");
 			msg.setText("Hogehogeシステム、新規ユーザー登録依頼を受け付けました。以下のURLから本登録処理を行ってください。Hogehogeシステム、ユーザー登録URL "
@@ -113,7 +121,11 @@ public class SendEmailController {
 
 	@RequestMapping("/regist")
 	public String index2(String key) {
+		List<SendEmail> sendEmailList = sendEmailService.findByKey(key);
 
+		if (sendEmailList.size() == 0) {
+			return "out";
+		}
 		session.setAttribute("uniqueKey", key);
 		return "register_user";
 	}

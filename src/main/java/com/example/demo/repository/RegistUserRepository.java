@@ -23,6 +23,7 @@ public class RegistUserRepository {
 
 	private static final RowMapper<RegistUser>USER_ROW_MAPPER = (rs,i)->{
 	RegistUser registUser= new RegistUser();
+		registUser.setId(rs.getInt("id"));
 	registUser.setEmail(rs.getString("email"));
 	registUser.setName(rs.getString("name"));
 	registUser.setKana(rs.getString("kana"));
@@ -42,7 +43,7 @@ public class RegistUserRepository {
 	}
 
 	public List<RegistUser> findByEmail(String userEmail) {
-		String sql = "SELECT * FROM regist_url WHERE email=:email and register_date +cast('1 days' as interval)>now();";
+		String sql = "SELECT * FROM users WHERE email=:email ";
 		SqlParameterSource param = new MapSqlParameterSource().addValue("email", userEmail);
 		List<RegistUser> registUser = template.query(sql, param, USER_ROW_MAPPER);
 		if (registUser.size() == 0) {
